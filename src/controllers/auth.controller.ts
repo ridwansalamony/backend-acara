@@ -51,6 +51,13 @@ export default {
   },
 
   async login(req: Request, res: Response, next: NextFunction) {
+    /**
+      #swagger.requestBody = {
+        required: true,
+        schema: {$ref: "#/components/schemas/LoginRequest"}
+      }
+     */
+
     const { identifier, password } = req.body as TLogin;
     try {
       const userByIdentifier = await UserModel.findOne({
@@ -99,6 +106,12 @@ export default {
   },
 
   async me(req: IUserRequest, res: Response, next: NextFunction) {
+    /**
+      #swagger.security = [{
+        "bearerAuth": []
+      }]
+    */
+
     try {
       const user = req.user;
       const response = await UserModel.findById(user?.id);
