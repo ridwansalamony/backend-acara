@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import router from "./routes/api";
 import db from "./utils/database";
 
@@ -10,7 +10,13 @@ async function init() {
 
     const app = express();
     const PORT = 3000;
+
     app.use(express.json());
+
+    app.get("/", (req: Request, res: Response) => {
+      res.status(200).json({ status: "Server is running!" });
+    });
+
     app.use("/api", router);
 
     app.listen(PORT, () => {
