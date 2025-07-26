@@ -1,5 +1,4 @@
 import swaggerAutogen from "swagger-autogen";
-import { serve } from "swagger-ui-express";
 
 const outputFile = "./swagger-output.json";
 const endpointsFiles = ["../routes/api"];
