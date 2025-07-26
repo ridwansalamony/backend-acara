@@ -29,8 +29,18 @@ const doc = {
     },
     schemas: {
       LoginRequest: {
-        identifier: "ridwansalamony",
-        password: "SVJ-w65Czm2t32",
+        identifier: "sayangkamu",
+        password: "Sayangkamu00",
+      },
+      RegisterRequest: {
+        fullname: "sayang kamu",
+        username: "sayangkamu",
+        email: "sayangkamu@yopmail.com",
+        password: "Sayangkamu00",
+        confirmPassword: "Sayangkamu00",
+      },
+      ActivationRequest: {
+        code: "abcdef",
       },
     },
   },

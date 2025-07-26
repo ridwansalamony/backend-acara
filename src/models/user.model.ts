@@ -27,11 +27,13 @@ const UserSchema = new Schema<IUser>(
     username: {
       type: Schema.Types.String,
       required: true,
+      unique: true,
     },
 
     email: {
       type: Schema.Types.String,
       required: true,
+      unique: true,
     },
 
     password: {
@@ -67,6 +69,7 @@ const UserSchema = new Schema<IUser>(
 UserSchema.pre("save", function (next) {
   const user = this;
   user.password = encrypt(user.password);
+  user.activationCode = encrypt(user.id);
   next();
 });
 

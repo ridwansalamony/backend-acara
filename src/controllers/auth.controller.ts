@@ -22,7 +22,27 @@ const registerValidateSchema = Yup.object({
   fullname: Yup.string().required(),
   username: Yup.string().required(),
   email: Yup.string().required(),
-  password: Yup.string().required(),
+  password: Yup.string()
+    .required()
+    .min(6, "password must be at least 6 characters")
+    .test("at-least-one-uppercase-letter", "contains at least one uppercase letter", (value) => {
+      if (!value) {
+        return false;
+      }
+
+      const regex = /^(?=.*[A-Z])/;
+
+      return regex.test(value);
+    })
+    .test("at-least-one-number", "contains at least one number", (value) => {
+      if (!value) {
+        return false;
+      }
+
+      const regex = /^(?=.*\d)/;
+
+      return regex.test(value);
+    }),
   confirmPassword: Yup.string()
     .required()
     .oneOf([Yup.ref("password"), ""], "password not match!"),
@@ -32,7 +52,12 @@ export default {
   async register(req: Request, res: Response, next: NextFunction) {
     /**
       #swagger.tags = ["Auth"]
-     */
+      #swagger.requestBody = {
+        required: true,
+        schema: {$ref: "#/components/schemas/RegisterRequest"}
+      }
+    */
+
     const { fullname, username, email, password, confirmPassword } = req.body as TRegister;
 
     try {
@@ -63,6 +88,7 @@ export default {
      */
 
     const { identifier, password } = req.body as TLogin;
+
     try {
       const userByIdentifier = await UserModel.findOne({
         $or: [
@@ -73,6 +99,7 @@ export default {
             username: identifier,
           },
         ],
+        isActive: true,
       });
 
       if (!userByIdentifier) {
@@ -117,13 +144,51 @@ export default {
       }]
     */
 
+    const user = req.user;
+
     try {
-      const user = req.user;
       const response = await UserModel.findById(user?.id);
 
       res.status(200).json({
         message: "get user profile successful!",
         data: response,
+      });
+    } catch (error) {
+      const err = error as Error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+  },
+
+  async activation(req: Request, res: Response, next: NextFunction) {
+    /**
+      #swagger.tags = ["Auth"]
+      #swagger.requestBody = {
+        required: true,
+        schema: {$ref: "#/components/schemas/ActivationRequest"}
+      }
+    */
+
+    const { code } = req.body as { code: string };
+
+    try {
+      const user = await UserModel.findOneAndUpdate(
+        {
+          activationCode: code,
+        },
+        {
+          isActive: true,
+        },
+        {
+          new: true,
+        }
+      );
+
+      res.status(200).json({
+        message: "user successfully activated",
+        data: user,
       });
     } catch (error) {
       const err = error as Error;
