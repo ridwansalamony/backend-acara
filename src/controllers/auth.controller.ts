@@ -5,6 +5,8 @@ import { encrypt } from "../utils/encryption";
 import { generateToken } from "../utils/jwt";
 import { TLogin, TRegister } from "../interfaces/auth.types";
 import { IUserRequest } from "../interfaces/user.interface";
+import { ApiResponse } from "../utils/response";
+import { AppError } from "../utils/error";
 
 const registerValidateSchema = Yup.object({
   fullname: Yup.string().required(),
@@ -37,7 +39,7 @@ const registerValidateSchema = Yup.object({
 });
 
 export default {
-  async register(req: Request, res: Response) {
+  async register(req: Request, res: Response, next: NextFunction) {
     /**
       #swagger.tags = ["Auth"]
       #swagger.requestBody = {
@@ -53,20 +55,22 @@ export default {
 
       const response = await UserModel.create({ fullname, username, email, password });
 
-      res.status(200).json({
-        message: "success registration!",
-        data: response,
+      const apiResponse = new ApiResponse(true, 200, "registration successful", response);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
       });
     } catch (error) {
-      const err = error as Error;
-      res.status(400).json({
-        message: err.message,
-        data: null,
-      });
+      next(error);
     }
   },
 
-  async login(req: Request, res: Response) {
+  async login(req: Request, res: Response, next: NextFunction) {
     /**
       #swagger.tags = ["Auth"]
       #swagger.requestBody = {
@@ -91,19 +95,13 @@ export default {
       });
 
       if (!userByIdentifier) {
-        return res.status(403).json({
-          message: "user not found!",
-          data: null,
-        });
+        throw new AppError("user not found", 403);
       }
 
       const validatedPassword: boolean = encrypt(password) === userByIdentifier.password;
 
       if (!validatedPassword) {
-        return res.status(403).json({
-          message: "user not found!",
-          data: null,
-        });
+        throw new AppError("user not found", 403);
       }
 
       const token = generateToken({
@@ -111,20 +109,22 @@ export default {
         role: userByIdentifier.role,
       });
 
-      res.status(200).json({
-        message: "login successful!",
-        data: token,
+      const apiResponse = new ApiResponse(true, 200, "login successfully", { token });
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
       });
     } catch (error) {
-      const err = error as Error;
-      res.status(400).json({
-        message: err.message,
-        data: null,
-      });
+      next(error);
     }
   },
 
-  async me(req: IUserRequest, res: Response) {
+  async me(req: IUserRequest, res: Response, next: NextFunction) {
     /**
       #swagger.tags = ["Auth"]
       #swagger.security = [{
@@ -137,20 +137,22 @@ export default {
     try {
       const response = await UserModel.findById(user?.id);
 
-      res.status(200).json({
-        message: "get user profile successful!",
-        data: response,
+      const apiResponse = new ApiResponse(true, 200, "get user profile successfully", response);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
       });
     } catch (error) {
-      const err = error as Error;
-      res.status(400).json({
-        message: err.message,
-        data: null,
-      });
+      next(error);
     }
   },
 
-  async activation(req: Request, res: Response) {
+  async activation(req: Request, res: Response, next: NextFunction) {
     /**
       #swagger.tags = ["Auth"]
       #swagger.requestBody = {
@@ -174,16 +176,18 @@ export default {
         }
       );
 
-      res.status(200).json({
-        message: "user successfully activated",
-        data: user,
+      const apiResponse = new ApiResponse(true, 200, "user has been successfully activated", user);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
       });
     } catch (error) {
-      const err = error as Error;
-      res.status(400).json({
-        message: err.message,
-        data: null,
-      });
+      next(error);
     }
   },
 };

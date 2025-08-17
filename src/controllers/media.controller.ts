@@ -1,73 +1,78 @@
-import { Response } from "express";
+import { NextFunction, Response } from "express";
 import { IUserRequest } from "../interfaces/user.interface";
 import uploader from "../utils/uploader";
+import { AppError } from "../utils/error";
+import { ApiResponse } from "../utils/response";
 
 export default {
-  async single(req: IUserRequest, res: Response) {
+  async single(req: IUserRequest, res: Response, next: NextFunction) {
     const file = req.file as Express.Multer.File;
 
     if (!file) {
-      return res.status(400).json({
-        message: "file is not exist",
-        data: null,
-      });
+      throw new AppError("file does not exist", 400);
     }
 
     try {
       const response = await uploader.uploadSingle(file);
 
-      res.status(200).json({
-        message: "upload success",
-        data: response,
+      const apiResponse = new ApiResponse(true, 200, "upload successful", response);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
       });
     } catch (error) {
-      res.status(500).json({
-        message: "failed to upload file!",
-        data: null,
-      });
+      next(error);
     }
   },
 
-  async multiple(req: IUserRequest, res: Response) {
+  async multiple(req: IUserRequest, res: Response, next: NextFunction) {
     const files = req.files as Express.Multer.File[];
 
     if (!files || files.length === 0) {
-      return res.status(400).json({
-        message: "files are not exist",
-        data: null,
-      });
+      throw new AppError("file does not exist", 400);
     }
 
     try {
       const response = await uploader.uploadMultiple(files);
 
-      res.status(200).json({
-        message: "upload success",
-        data: response,
+      const apiResponse = new ApiResponse(true, 200, "upload successful", response);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
       });
     } catch (error) {
-      res.status(500).json({
-        message: "failed to upload files!",
-        data: null,
-      });
+      next(error);
     }
   },
 
-  async delete(req: IUserRequest, res: Response) {
+  async delete(req: IUserRequest, res: Response, next: NextFunction) {
     try {
       const { fileUrl } = req.body as { fileUrl: string };
 
       const response = await uploader.delete(fileUrl);
 
-      res.status(200).json({
-        message: "delete file success",
-        data: response,
+      const apiResponse = new ApiResponse(true, 200, "deleting files was successful", response);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
       });
     } catch (error) {
-      res.status(500).json({
-        message: "failed to delete files!",
-        data: null,
-      });
+      next(error);
     }
   },
 };

@@ -1,5 +1,5 @@
 import mongoose, { mongo } from "mongoose";
-import { DATABASE_URL } from "./env";
+import { DATABASE_URL } from "../utils/env";
 
 const connect = async () => {
   try {
@@ -10,7 +10,7 @@ const connect = async () => {
     return Promise.resolve("database connected!");
   } catch (error) {
     const err = error as Error;
-    return Promise.reject(err);
+    return Promise.reject(err.message);
   }
 };
 

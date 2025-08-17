@@ -1,33 +1,25 @@
 import { Response, NextFunction } from "express";
 import { getUserData } from "../utils/jwt";
 import { IUserRequest } from "../interfaces/user.interface";
+import { AppError } from "../utils/error";
 
 export default (req: IUserRequest, res: Response, next: NextFunction) => {
   const authorization = req.headers?.authorization!;
 
   if (!authorization) {
-    res.status(403).json({
-      message: "unauthorized!",
-      data: null,
-    });
+    throw new AppError("unauthorized", 401);
   }
 
   const [prefix, token] = authorization.split(" ");
 
   if (!(prefix === "Bearer" && token)) {
-    res.status(403).json({
-      message: "unauthorized!",
-      data: null,
-    });
+    throw new AppError("unauthorized", 401);
   }
 
   const user = getUserData(token);
 
   if (!user) {
-    res.status(403).json({
-      message: "unauthorized!",
-      data: null,
-    });
+    throw new AppError("unauthorized", 401);
   }
 
   req.user = user;

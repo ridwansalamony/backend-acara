@@ -4,6 +4,7 @@ import { sendMail, renderMailHtml } from "../utils/mail/mail";
 import { CLIENT_HOST, EMAIL_SMTP_USER } from "../utils/env";
 import { ROLES } from "../utils/constant";
 import { IUser } from "../interfaces/user.interface";
+import { AppError } from "../utils/error";
 
 const Schema = mongoose.Schema;
 
@@ -85,7 +86,7 @@ UserSchema.post("save", async function (doc, next) {
     });
   } catch (error) {
     const err = error as Error;
-    console.log(err.message);
+    throw new AppError(err.message, 500);
   } finally {
     next();
   }
