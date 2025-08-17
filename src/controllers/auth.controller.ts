@@ -3,20 +3,8 @@ import * as Yup from "yup";
 import UserModel from "../models/user.model";
 import { encrypt } from "../utils/encryption";
 import { generateToken } from "../utils/jwt";
-import { IUserRequest } from "../middlewares/auth.middleware";
-
-type TRegister = {
-  fullname: string;
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
-
-type TLogin = {
-  identifier: string;
-  password: string;
-};
+import { TLogin, TRegister } from "../interfaces/auth.types";
+import { IUserRequest } from "../interfaces/user.interface";
 
 const registerValidateSchema = Yup.object({
   fullname: Yup.string().required(),
@@ -49,7 +37,7 @@ const registerValidateSchema = Yup.object({
 });
 
 export default {
-  async register(req: Request, res: Response, next: NextFunction) {
+  async register(req: Request, res: Response) {
     /**
       #swagger.tags = ["Auth"]
       #swagger.requestBody = {
@@ -78,7 +66,7 @@ export default {
     }
   },
 
-  async login(req: Request, res: Response, next: NextFunction) {
+  async login(req: Request, res: Response) {
     /**
       #swagger.tags = ["Auth"]
       #swagger.requestBody = {
@@ -136,7 +124,7 @@ export default {
     }
   },
 
-  async me(req: IUserRequest, res: Response, next: NextFunction) {
+  async me(req: IUserRequest, res: Response) {
     /**
       #swagger.tags = ["Auth"]
       #swagger.security = [{
@@ -162,7 +150,7 @@ export default {
     }
   },
 
-  async activation(req: Request, res: Response, next: NextFunction) {
+  async activation(req: Request, res: Response) {
     /**
       #swagger.tags = ["Auth"]
       #swagger.requestBody = {
