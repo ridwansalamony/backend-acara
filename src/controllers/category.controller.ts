@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import CategoryModel, { categoryDAO, TCategory } from "../models/category.model";
 import { ApiResponse } from "../utils/ApiResponse";
 import { TPaginationQuery } from "../interfaces/page.types";
+import { FilterQuery } from "mongoose";
 
 export default {
   async create(req: Request, res: Response, next: NextFunction) {
@@ -17,8 +18,9 @@ export default {
   },
 
   async findOne(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params as { id: string };
     try {
+      const { id } = req.params as { id: string };
+
       const response = await CategoryModel.findById(id);
 
       return ApiResponse.success(res, true, 200, "get category a by id successful", response);
@@ -28,11 +30,11 @@ export default {
   },
 
   async findAll(req: Request, res: Response, next: NextFunction) {
-    const { page = 1, limit = 10, search } = req.query as unknown as TPaginationQuery;
-
-    const query = {};
-
     try {
+      const { page = 1, limit = 10, search } = req.query as unknown as TPaginationQuery;
+
+      const query = {} as FilterQuery<TCategory>;
+
       if (search) {
         Object.assign(query, {
           $or: [
@@ -61,9 +63,9 @@ export default {
   },
 
   async update(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params as { id: string };
-
     try {
+      const { id } = req.params as { id: string };
+
       const response = await CategoryModel.findByIdAndUpdate(id, req.body, { new: true });
 
       return ApiResponse.success(res, true, 200, "category update successful", response);
@@ -73,9 +75,9 @@ export default {
   },
 
   async delete(req: Request, res: Response, next: NextFunction) {
-    const { id } = req.params as { id: string };
-
     try {
+      const { id } = req.params as { id: string };
+
       const response = await CategoryModel.findByIdAndDelete(id);
 
       return ApiResponse.success(res, true, 200, "deleting category was successful", response);

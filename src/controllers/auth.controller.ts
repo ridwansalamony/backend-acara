@@ -48,9 +48,9 @@ export default {
       }
     */
 
-    const { fullname, username, email, password, confirmPassword } = req.body as TRegister;
-
     try {
+      const { fullname, username, email, password, confirmPassword } = req.body as TRegister;
+
       await registerValidateSchema.validate({ fullname, username, email, password, confirmPassword });
 
       const response = await UserModel.create({ fullname, username, email, password });
@@ -70,9 +70,9 @@ export default {
       }
      */
 
-    const { identifier, password } = req.body as TLogin;
-
     try {
+      const { identifier, password } = req.body as TLogin;
+
       const userByIdentifier = await UserModel.findOne({
         $or: [
           {
@@ -114,9 +114,9 @@ export default {
       }]
     */
 
-    const user = req.user;
-
     try {
+      const user = req.user;
+
       const response = await UserModel.findById(user?.id);
 
       return ApiResponse.success(res, true, 200, "get user profile successfully", response);
@@ -134,9 +134,9 @@ export default {
       }
     */
 
-    const { code } = req.body as { code: string };
-
     try {
+      const { code } = req.body as { code: string };
+
       const response = await UserModel.findOneAndUpdate(
         {
           activationCode: code,
