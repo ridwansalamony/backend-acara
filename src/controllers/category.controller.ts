@@ -1,0 +1,132 @@
+import { Request, Response, NextFunction } from "express";
+import CategoryModel, { categoryDAO, TCategory } from "../models/category.model";
+import { ApiResponse } from "../utils/response";
+import { TPaginationQuery } from "../interfaces/page.types";
+
+export default {
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const createRequestValidated = await categoryDAO.validate(req.body as TCategory);
+
+      const response = await CategoryModel.create(createRequestValidated);
+
+      const apiResponse = new ApiResponse(true, 200, "create a successful category", response);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async findOne(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params as { id: string };
+    try {
+      const response = await CategoryModel.findById(id);
+
+      const apiResponse = new ApiResponse(true, 200, "get category a by id successful", response);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async findAll(req: Request, res: Response, next: NextFunction) {
+    const { page = 1, limit = 10, search } = req.query as unknown as TPaginationQuery;
+
+    const query = {};
+
+    try {
+      if (search) {
+        Object.assign(query, {
+          $or: [
+            {
+              name: { $regex: search, $options: "i" },
+            },
+            {
+              description: { $regex: search, $options: "i" },
+            },
+          ],
+        });
+      }
+
+      const response = await CategoryModel.find(query)
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .sort({ createdAt: -1 })
+        .exec();
+
+      const countPage = await CategoryModel.countDocuments(query);
+
+      const apiResponse = new ApiResponse(true, 200, "get all categories successfully", response, { current: page, totalPages: Math.ceil(countPage / limit), total: countPage });
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
+        pagination: apiResponse.pagination,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params as { id: string };
+
+    try {
+      const response = await CategoryModel.findByIdAndUpdate(id, req.body, { new: true });
+
+      const apiResponse = new ApiResponse(true, 200, "category update successful", response);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params as { id: string };
+
+    try {
+      const response = await CategoryModel.findByIdAndDelete(id);
+
+      const apiResponse = new ApiResponse(true, 200, "deleting category was successful", response);
+
+      res.status(apiResponse.statusCode).json({
+        meta: {
+          status: apiResponse.status,
+          statusCode: apiResponse.statusCode,
+          message: apiResponse.message,
+        },
+        data: apiResponse.data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+};

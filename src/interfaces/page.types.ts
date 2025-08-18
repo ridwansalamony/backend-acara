@@ -3,3 +3,9 @@ export type TPagination = {
   totalPages: number;
   total: number;
 };
+
+export type TPaginationQuery = {
+  page: number;
+  limit: number;
+  search?: string;
+};
