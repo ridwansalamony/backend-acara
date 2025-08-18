@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import { getUserData } from "../utils/jwt";
 import { IUserRequest } from "../interfaces/user.interface";
-import { AppError } from "../utils/error";
+import { AppError } from "../utils/AppError";
 
 export default (req: IUserRequest, res: Response, next: NextFunction) => {
   const authorization = req.headers?.authorization!;

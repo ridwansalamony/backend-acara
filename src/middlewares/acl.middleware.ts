@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express";
 import { IUserRequest } from "../interfaces/user.interface";
-import { AppError } from "../utils/error";
+import { AppError } from "../utils/AppError";
 
 export default function (roles: string[]) {
   return (req: IUserRequest, res: Response, next: NextFunction) => {

@@ -13,7 +13,7 @@ async function init() {
     });
   } catch (error) {
     const err = error as Error;
-    console.log(err.message);
+    console.error(err.message);
   }
 }
 

@@ -4,7 +4,7 @@ import { sendMail, renderMailHtml } from "../utils/mail/mail";
 import { CLIENT_HOST, EMAIL_SMTP_USER } from "../utils/env";
 import { ROLES } from "../utils/constant";
 import { IUser } from "../interfaces/user.interface";
-import { AppError } from "../utils/error";
+import { AppError } from "../utils/AppError";
 
 const Schema = mongoose.Schema;
 
@@ -68,8 +68,6 @@ UserSchema.post("save", async function (doc, next) {
   try {
     const user = doc;
 
-    console.log("send email to: " + user);
-
     const contentMail = await renderMailHtml("registration-success.ejs", {
       fullname: user.fullname,
       username: user.username,
@@ -86,7 +84,7 @@ UserSchema.post("save", async function (doc, next) {
     });
   } catch (error) {
     const err = error as Error;
-    throw new AppError(err.message, 500);
+    console.error(err.message);
   } finally {
     next();
   }

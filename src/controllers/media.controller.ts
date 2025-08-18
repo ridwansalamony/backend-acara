@@ -1,8 +1,8 @@
 import { NextFunction, Response } from "express";
 import { IUserRequest } from "../interfaces/user.interface";
 import uploader from "../utils/uploader";
-import { AppError } from "../utils/error";
-import { ApiResponse } from "../utils/response";
+import { AppError } from "../utils/AppError";
+import { ApiResponse } from "../utils/ApiResponse";
 
 export default {
   async single(req: IUserRequest, res: Response, next: NextFunction) {
@@ -15,16 +15,7 @@ export default {
     try {
       const response = await uploader.uploadSingle(file);
 
-      const apiResponse = new ApiResponse(true, 200, "upload successful", response);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "upload successful", response);
     } catch (error) {
       next(error);
     }
@@ -40,16 +31,7 @@ export default {
     try {
       const response = await uploader.uploadMultiple(files);
 
-      const apiResponse = new ApiResponse(true, 200, "upload successful", response);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "upload successful", response);
     } catch (error) {
       next(error);
     }
@@ -61,16 +43,7 @@ export default {
 
       const response = await uploader.delete(fileUrl);
 
-      const apiResponse = new ApiResponse(true, 200, "deleting files was successful", response);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "deleting files was successful", response);
     } catch (error) {
       next(error);
     }

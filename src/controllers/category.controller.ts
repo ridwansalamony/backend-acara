@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import CategoryModel, { categoryDAO, TCategory } from "../models/category.model";
-import { ApiResponse } from "../utils/response";
+import { ApiResponse } from "../utils/ApiResponse";
 import { TPaginationQuery } from "../interfaces/page.types";
 
 export default {
@@ -10,16 +10,7 @@ export default {
 
       const response = await CategoryModel.create(createRequestValidated);
 
-      const apiResponse = new ApiResponse(true, 200, "create a successful category", response);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "create a successful category", response);
     } catch (error) {
       next(error);
     }
@@ -30,16 +21,7 @@ export default {
     try {
       const response = await CategoryModel.findById(id);
 
-      const apiResponse = new ApiResponse(true, 200, "get category a by id successful", response);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "get category a by id successful", response);
     } catch (error) {
       next(error);
     }
@@ -72,17 +54,7 @@ export default {
 
       const countPage = await CategoryModel.countDocuments(query);
 
-      const apiResponse = new ApiResponse(true, 200, "get all categories successfully", response, { current: page, totalPages: Math.ceil(countPage / limit), total: countPage });
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-        pagination: apiResponse.pagination,
-      });
+      return ApiResponse.success(res, true, 200, "get all categories successfully", response, { current: page, totalPages: Math.ceil(countPage / limit), total: countPage });
     } catch (error) {
       next(error);
     }
@@ -94,16 +66,7 @@ export default {
     try {
       const response = await CategoryModel.findByIdAndUpdate(id, req.body, { new: true });
 
-      const apiResponse = new ApiResponse(true, 200, "category update successful", response);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "category update successful", response);
     } catch (error) {
       next(error);
     }
@@ -115,16 +78,7 @@ export default {
     try {
       const response = await CategoryModel.findByIdAndDelete(id);
 
-      const apiResponse = new ApiResponse(true, 200, "deleting category was successful", response);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "deleting category was successful", response);
     } catch (error) {
       next(error);
     }

@@ -5,8 +5,8 @@ import { encrypt } from "../utils/encryption";
 import { generateToken } from "../utils/jwt";
 import { TLogin, TRegister } from "../interfaces/auth.types";
 import { IUserRequest } from "../interfaces/user.interface";
-import { ApiResponse } from "../utils/response";
-import { AppError } from "../utils/error";
+import { ApiResponse } from "../utils/ApiResponse";
+import { AppError } from "../utils/AppError";
 
 const registerValidateSchema = Yup.object({
   fullname: Yup.string().required(),
@@ -15,7 +15,7 @@ const registerValidateSchema = Yup.object({
   password: Yup.string()
     .required()
     .min(6, "password must be at least 6 characters")
-    .test("at-least-one-uppercase-letter", "contains at least one uppercase letter", (value) => {
+    .test("at-least-one-uppercase-letter", "password must contain at least one capital letter", (value) => {
       if (!value) {
         return false;
       }
@@ -24,7 +24,7 @@ const registerValidateSchema = Yup.object({
 
       return regex.test(value);
     })
-    .test("at-least-one-number", "contains at least one number", (value) => {
+    .test("at-least-one-number", "password must contain at least one number", (value) => {
       if (!value) {
         return false;
       }
@@ -55,16 +55,7 @@ export default {
 
       const response = await UserModel.create({ fullname, username, email, password });
 
-      const apiResponse = new ApiResponse(true, 200, "registration successful", response);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "registration successful", response);
     } catch (error) {
       next(error);
     }
@@ -95,13 +86,13 @@ export default {
       });
 
       if (!userByIdentifier) {
-        throw new AppError("user not found", 403);
+        throw new AppError("user not found", 404);
       }
 
       const validatedPassword: boolean = encrypt(password) === userByIdentifier.password;
 
       if (!validatedPassword) {
-        throw new AppError("user not found", 403);
+        throw new AppError("user not found", 404);
       }
 
       const token = generateToken({
@@ -109,16 +100,7 @@ export default {
         role: userByIdentifier.role,
       });
 
-      const apiResponse = new ApiResponse(true, 200, "login successfully", { token });
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "login successfully", { token });
     } catch (error) {
       next(error);
     }
@@ -137,16 +119,7 @@ export default {
     try {
       const response = await UserModel.findById(user?.id);
 
-      const apiResponse = new ApiResponse(true, 200, "get user profile successfully", response);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "get user profile successfully", response);
     } catch (error) {
       next(error);
     }
@@ -164,7 +137,7 @@ export default {
     const { code } = req.body as { code: string };
 
     try {
-      const user = await UserModel.findOneAndUpdate(
+      const response = await UserModel.findOneAndUpdate(
         {
           activationCode: code,
         },
@@ -176,16 +149,7 @@ export default {
         }
       );
 
-      const apiResponse = new ApiResponse(true, 200, "user has been successfully activated", user);
-
-      res.status(apiResponse.statusCode).json({
-        meta: {
-          status: apiResponse.status,
-          statusCode: apiResponse.statusCode,
-          message: apiResponse.message,
-        },
-        data: apiResponse.data,
-      });
+      return ApiResponse.success(res, true, 200, "user has been successfully activated", response);
     } catch (error) {
       next(error);
     }
