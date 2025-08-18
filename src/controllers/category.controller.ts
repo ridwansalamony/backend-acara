@@ -78,7 +78,7 @@ export default {
     try {
       const { id } = req.params as { id: string };
 
-      const response = await CategoryModel.findByIdAndDelete(id);
+      const response = await CategoryModel.findByIdAndDelete(id, { new: true });
 
       return ApiResponse.success(res, true, 200, "deleting category was successful", response);
     } catch (error) {
