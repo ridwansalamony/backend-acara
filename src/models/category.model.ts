@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 import * as Yup from "yup";
 
 const Schema = mongoose.Schema;

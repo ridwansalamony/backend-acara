@@ -11,7 +11,7 @@ export default {
 
       const response = await CategoryModel.create(createRequestValidated);
 
-      return ApiResponse.success(res, true, 200, "create a successful category", response);
+      return ApiResponse.success(res, true, 200, "create the category successful", response);
     } catch (error) {
       next(error);
     }
@@ -23,7 +23,7 @@ export default {
 
       const response = await CategoryModel.findById(id);
 
-      return ApiResponse.success(res, true, 200, "get category a by id successful", response);
+      return ApiResponse.success(res, true, 200, "get a category by id successful", response);
     } catch (error) {
       next(error);
     }
@@ -33,10 +33,11 @@ export default {
     try {
       const { page = 1, limit = 10, search } = req.query as unknown as TPaginationQuery;
 
-      const query = {} as FilterQuery<TCategory>;
+      const query: FilterQuery<TCategory> = {};
 
       if (search) {
         Object.assign(query, {
+          ...query,
           $or: [
             {
               name: { $regex: search, $options: "i" },
@@ -68,7 +69,7 @@ export default {
 
       const response = await CategoryModel.findByIdAndUpdate(id, req.body, { new: true });
 
-      return ApiResponse.success(res, true, 200, "category update successful", response);
+      return ApiResponse.success(res, true, 200, "category updated successful", response);
     } catch (error) {
       next(error);
     }
@@ -80,7 +81,7 @@ export default {
 
       const response = await CategoryModel.findByIdAndDelete(id, { new: true });
 
-      return ApiResponse.success(res, true, 200, "deleting category was successful", response);
+      return ApiResponse.success(res, true, 200, "category deleted successfully", response);
     } catch (error) {
       next(error);
     }

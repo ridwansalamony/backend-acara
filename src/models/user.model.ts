@@ -4,7 +4,6 @@ import { sendMail, renderMailHtml } from "../utils/mail/mail";
 import { CLIENT_HOST, EMAIL_SMTP_USER } from "../utils/env";
 import { ROLES } from "../utils/constant";
 import { IUser } from "../interfaces/user.interface";
-import { AppError } from "../utils/AppError";
 
 const Schema = mongoose.Schema;
 
