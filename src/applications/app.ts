@@ -11,7 +11,13 @@ app.use(cors());
 app.use(express.json());
 app.use("/api", router);
 app.use(errorMiddleware);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerOutput));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerOutput, {
+    customCss: "../../node_modules/swagger-ui-dist/swagger-ui.css",
+  })
+);
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ status: "Server is running!" });
